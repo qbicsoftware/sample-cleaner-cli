@@ -1,8 +1,8 @@
-package life.qbic.database;
+package life.qbic.samplecleaner.database;
 
 import java.util.Properties;
 import javax.annotation.PreDestroy;
-import life.qbic.tracking.SampleLocation;
+import life.qbic.samplecleaner.tracking.SampleLocation;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * @since <version tag>
  */
 @Component
-class HibernateSession implements SessionProvider {
+public class HibernateSession implements SessionProvider {
 
     final SessionFactory sessionFactory;
 
@@ -31,9 +31,9 @@ class HibernateSession implements SessionProvider {
         properties.put(Environment.USER, config.user);
         properties.put(Environment.PASS, config.password);
         properties.put(Environment.DIALECT, config.sqlDialect);
+        properties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
 
         hibernateConfig.setProperties(properties);
-
         hibernateConfig.addAnnotatedClass(SampleLocation.class);
 
         sessionFactory = hibernateConfig.buildSessionFactory();

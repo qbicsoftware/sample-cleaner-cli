@@ -1,4 +1,4 @@
-package life.qbic.tracking;
+package life.qbic.samplecleaner.tracking;
 
 import java.time.LocalDate;
 import java.util.Objects;

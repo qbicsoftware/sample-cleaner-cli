@@ -1,4 +1,4 @@
-package life.qbic.database;
+package life.qbic.samplecleaner.database;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 public class DataBaseConfig {
 
   @Value("${databases.users.user.name}")
-  String user;
+  public String user;
   @Value("${databases.users.user.password}")
-  String password;
+  public String password;
   @Value("${databases.users.database.url}")
-  String url;
+  public String url;
   @Value("${databases.users.database.dialect}")
-  String sqlDialect;
+  public String sqlDialect;
   @Value("${databases.users.database.driver}")
-  String driver;
+  public String driver;
 
 }

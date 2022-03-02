@@ -1,4 +1,4 @@
-package life.qbic.database;
+package life.qbic.samplecleaner.database;
 
 import org.hibernate.Session;
 
@@ -9,5 +9,5 @@ import org.hibernate.Session;
  */
 public interface SessionProvider {
 
-    Session getCurrentSession();
+    public Session getCurrentSession();
 }

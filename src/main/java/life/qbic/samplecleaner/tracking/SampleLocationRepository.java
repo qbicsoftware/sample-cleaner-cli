@@ -1,8 +1,8 @@
-package life.qbic.tracking;
+package life.qbic.samplecleaner.tracking;
 
 import java.util.ArrayList;
 import java.util.List;
-import life.qbic.database.SessionProvider;
+import life.qbic.samplecleaner.database.SessionProvider;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -15,11 +15,11 @@ public class SampleLocationRepository {
   SessionProvider sessionProvider;
 
   @Autowired
-  SampleLocationRepository(SessionProvider sessionProvider) {
+  public SampleLocationRepository(SessionProvider sessionProvider) {
     this.sessionProvider = sessionProvider;
   }
 
-  List<SampleLocation> getAllSampleLocations() {
+  public List<SampleLocation> getAllSampleLocations() {
     List<SampleLocation> sampleLocations = new ArrayList<>();
     try (Session session = sessionProvider.getCurrentSession()) {
       session.beginTransaction();
