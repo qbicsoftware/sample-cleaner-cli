@@ -1,7 +1,10 @@
 package life.qbic.samplecleaner;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import life.qbic.samplecleaner.tracking.SampleLocation;
 import life.qbic.samplecleaner.tracking.SampleLocationRepository;
@@ -18,6 +21,9 @@ public class App implements CommandLineRunner {
 
   final SampleLocationRepository sampleLocationRepository;
 
+  final String file = "/Users/jenniferboedker/IdeaProjects/sample-cleaner-cli/src/main/resources/experiment-details-grid-sample-q_sample_preparation.tsv";
+  private final List<String> whiteListedSamples = new ArrayList<>();
+
   @Autowired
   public App(ApplicationContext applicationContext, SampleLocationRepository sampleLocationRepository) {
     this.applicationContext = applicationContext;
@@ -30,18 +36,36 @@ public class App implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    System.out.println(args[1]);
-    String file = "/Users/jenniferboedker/IdeaProjects/sample-cleaner-cli/src/main/resources/experiment-details-grid-sample-q_sample_preparation.tsv";
-    List<SampleLocation> sampleLocations = sampleLocationRepository.getSampleLocations("QSTTS");
-    System.out.println("Number of sample locations found: "+ sampleLocations.size());
+    System.out.println("Parsing whitelist ...");
+    try{
+      parseWhiteList(file);
+      sampleLocationRepository.removeOutdatedSamples(whiteListedSamples,getProjectCode());
+    }catch (Exception e){
+      System.out.println(e.getMessage());
+    }
   }
 
-  private List<String> parseSampleList(String pathToFile){
-    try(FileInputStream input = new FileInputStream(pathToFile)){
+  private String getProjectCode(){
+    String projectCode = whiteListedSamples.get(0).substring(0,5);
+    return projectCode;
+  }
 
-    }catch(IOException ioException){
+  private void parseWhiteList(String pathToFile){
+    try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        // process the line.
+        String[] columns = line.split("\t");
+        String sampleCode = columns[0];
 
+        if(sampleCode.startsWith("Q")){
+          whiteListedSamples.add(sampleCode);
+        }
+      }
     }
-    return null;
+    catch(IOException ioException){
+      System.out.println("Error while reading input file");
+    //todo throw exception here
+    }
   }
 }
