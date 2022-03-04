@@ -1,5 +1,7 @@
 package life.qbic.samplecleaner;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import life.qbic.samplecleaner.tracking.SampleLocation;
 import life.qbic.samplecleaner.tracking.SampleLocationRepository;
@@ -28,7 +30,18 @@ public class App implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    List<SampleLocation> sampleLocations = sampleLocationRepository.getAllSampleLocations();
+    System.out.println(args[1]);
+    String file = "/Users/jenniferboedker/IdeaProjects/sample-cleaner-cli/src/main/resources/experiment-details-grid-sample-q_sample_preparation.tsv";
+    List<SampleLocation> sampleLocations = sampleLocationRepository.getSampleLocations("QSTTS");
     System.out.println("Number of sample locations found: "+ sampleLocations.size());
+  }
+
+  private List<String> parseSampleList(String pathToFile){
+    try(FileInputStream input = new FileInputStream(pathToFile)){
+
+    }catch(IOException ioException){
+
+    }
+    return null;
   }
 }
