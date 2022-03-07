@@ -36,13 +36,13 @@ public class SampleLocationRepository {
       //1. find out which tracked samples are not on the whitelist
       var trackedSamples = getSampleLocations(session, projectCode);
       LOG.info(
-          String.format("Collected %d tracked samples for project %s ... %n", trackedSamples.size(),
+          String.format("Collected %d tracked samples for project %s ...", trackedSamples.size(),
               projectCode));
       //2. remove the samples
       for (var sample : trackedSamples) {
         if (!whiteListSamples.contains(sample.sampleId)) {
           deleteSampleTracking(session, sample.sampleId);
-          LOG.info(String.format("Deleted sample with ID %s ... %n", sample.sampleId));
+          LOG.info(String.format("Deleted sample with ID %s ...", sample.sampleId));
         }
       }
       session.getTransaction().commit();
@@ -69,8 +69,8 @@ public class SampleLocationRepository {
 
   /**
    * Deletes the tracking information for a given sample
-   *
-   * @param sampleCode
+   * @param session Session object from hibernate
+   * @param sampleCode Respective openbis sample code
    */
   private void deleteSampleTracking(Session session, String sampleCode) {
     Query<SampleLocation> query = session.createQuery(

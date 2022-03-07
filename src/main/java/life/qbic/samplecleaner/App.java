@@ -29,7 +29,6 @@ public class App implements CommandLineRunner {
   final static Pattern sampleCodePattern = Pattern.compile("^Q.*");
 
   private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(App.class);
-  private final List<String> whiteListedSamples = new ArrayList<>();
 
   @Autowired
   public App(
@@ -47,19 +46,20 @@ public class App implements CommandLineRunner {
     LOG.info("Parsing whitelist ...");
     String filePath = args[0];
     try {
-      parseWhiteList(filePath);
-      sampleLocationRepository.deleteSamples(whiteListedSamples, getProjectCode());
+      List<String> whiteListedSamples = parseWhiteList(filePath);
+      String projectCode = getProjectCode(whiteListedSamples);
+
+      sampleLocationRepository.deleteSamples(whiteListedSamples, projectCode);
     } catch (Exception e) {
       LOG.error(e.getMessage());
     }
   }
 
-  private String getProjectCode() {
-    String projectCode = whiteListedSamples.get(0).substring(0, 5);
-    return projectCode;
+  private String getProjectCode(List<String> samples) {
+    return samples.get(0).substring(0, 5);
   }
 
-  private static List<String> parseWhiteList2(String pathToFile) throws IOException {
+  private static List<String> parseWhiteList(String pathToFile) throws IOException {
     List<String> lines = Files.readAllLines(Paths.get(pathToFile));
     return lines.stream()
         .map(App::extractFirstColumn)
@@ -74,23 +74,5 @@ public class App implements CommandLineRunner {
   private static boolean isSampleCode(String code) {
     Matcher matcher = sampleCodePattern.matcher(code);
     return matcher.find();
-  }
-
-  private void parseWhiteList(String pathToFile) {
-    try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
-      String line;
-      while ((line = br.readLine()) != null) {
-        // process the line.
-        String[] columns = line.split("\t");
-        String sampleCode = columns[0];
-
-        if (sampleCode.startsWith("Q")) {
-          whiteListedSamples.add(sampleCode);
-        }
-      }
-    } catch (IOException ioException) {
-      LOG.error("Failed reading input sample file");
-      LOG.error(ioException.getMessage());
-    }
   }
 }
