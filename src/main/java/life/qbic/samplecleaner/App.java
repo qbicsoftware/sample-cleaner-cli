@@ -1,13 +1,12 @@
 package life.qbic.samplecleaner;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import life.qbic.samplecleaner.tracking.SampleLocation;
 import life.qbic.samplecleaner.tracking.SampleLocationRepository;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -21,7 +20,7 @@ public class App implements CommandLineRunner {
 
   final SampleLocationRepository sampleLocationRepository;
 
-  final String file = "/Users/jenniferboedker/IdeaProjects/sample-cleaner-cli/src/main/resources/experiment-details-grid-sample-q_sample_preparation.tsv";
+  private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(App.class);
   private final List<String> whiteListedSamples = new ArrayList<>();
 
   @Autowired
@@ -36,12 +35,13 @@ public class App implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    System.out.println("Parsing whitelist ...");
+   LOG.info("Parsing whitelist ...");
+    String filePath = args[0];
     try{
-      parseWhiteList(file);
+      parseWhiteList(filePath);
       sampleLocationRepository.removeOutdatedSamples(whiteListedSamples,getProjectCode());
     }catch (Exception e){
-      System.out.println(e.getMessage());
+      LOG.error(e.getMessage());
     }
   }
 
@@ -64,8 +64,8 @@ public class App implements CommandLineRunner {
       }
     }
     catch(IOException ioException){
-      System.out.println("Error while reading input file");
-    //todo throw exception here
+      LOG.error("Failed reading input sample file");
+      LOG.error(ioException.getMessage());
     }
   }
 }

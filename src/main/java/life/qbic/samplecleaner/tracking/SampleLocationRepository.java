@@ -2,7 +2,9 @@ package life.qbic.samplecleaner.tracking;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import life.qbic.samplecleaner.database.SessionProvider;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class SampleLocationRepository {
 
   SessionProvider sessionProvider;
+  private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(SampleLocationRepository.class);
 
   @Autowired
   public SampleLocationRepository(SessionProvider sessionProvider) {
@@ -27,22 +30,22 @@ public class SampleLocationRepository {
   public void removeOutdatedSamples(List<String> whiteListSamples, String projectCode){
     try (Session session = sessionProvider.getCurrentSession()) {
       session.beginTransaction();
-      System.out.println("Starting session ...");
+      LOG.info("Starting session ...");
       //1. find out which tracked samples are not on the whitelist
       List<SampleLocation> trackedSamples = getSampleLocations(session,projectCode);
-      System.out.printf("Collected %d tracked samples for project %s ... %n",trackedSamples.size(),projectCode);
+      LOG.info(String.format("Collected %d tracked samples for project %s ... %n",trackedSamples.size(),projectCode));
       //2. remove the samples
       for (SampleLocation sample:trackedSamples) {
         if(!whiteListSamples.contains(sample.sampleId)){
-          //deleteSampleTracking(session,sample.sampleId);
-          System.out.printf("Deleted sample with ID %s ... %n",sample.sampleId);
+          deleteSampleTracking(session,sample.sampleId);
+          LOG.info(String.format("Deleted sample with ID %s ... %n",sample.sampleId));
         }
       }
       session.getTransaction().commit();
-      System.out.println("Finished session ...");
+      LOG.info("Finished session ...");
     } catch (HibernateException exception) {
-      exception.printStackTrace();
-      throw new RuntimeException("Error while trying to remove outdated samples");
+      LOG.error(exception.getMessage());
+      throw new HibernateException("Error while trying to remove outdated samples",exception);
     }
   }
 
