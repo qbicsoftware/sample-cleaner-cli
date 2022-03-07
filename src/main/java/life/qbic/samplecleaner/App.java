@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import life.qbic.samplecleaner.tracking.SampleLocation;
 import life.qbic.samplecleaner.tracking.SampleLocationRepository;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +50,36 @@ public class App implements CommandLineRunner {
     try {
       List<String> whiteListedSamples = parseWhiteList(filePath);
       LOG.info(String.format("%d samples are whitelisted ...", whiteListedSamples.size()));
+
       String projectCode = getProjectCode(whiteListedSamples);
 
-      sampleLocationRepository.deleteSamples(whiteListedSamples, projectCode);
+      var trackedSamples = sampleLocationRepository.getSampleLocations(projectCode);
+      LOG.info(
+              String.format("Collected %d tracked samples for project %s ...", trackedSamples.size(),
+                      projectCode));
+
+      var samplesToDelete = extractSamplesToDelete(whiteListedSamples,trackedSamples);
+      var deletedSamples = deleteAllSamples(samplesToDelete);
+      LOG.info(String.format("Deleted %d samples...",deletedSamples));
+
     } catch (Exception e) {
       LOG.error(e.getMessage());
     }
+  }
+
+  private List<SampleLocation> extractSamplesToDelete(List<String> whiteListedSamples, List<SampleLocation> trackedSamples){
+    return trackedSamples.stream()
+            .filter(sampleLocation -> !whiteListedSamples.contains(sampleLocation.getSampleId()))
+            .collect(Collectors.toList());
+  }
+
+  private int deleteAllSamples(List<SampleLocation> samples){
+    var deletedSamples = 0;
+    for (var sample : samples) {
+      sampleLocationRepository.deleteSample(sample.getSampleId());
+      deletedSamples++;
+    }
+    return deletedSamples;
   }
 
   private String getProjectCode(List<String> samples) {

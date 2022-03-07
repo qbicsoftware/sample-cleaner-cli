@@ -26,59 +26,43 @@ public class SampleLocationRepository {
   }
 
   /**
-   * Deletes all samples from the sample tracking database
-   * that are not mentioned in the provided whitelist for a given project.
-   *
-   * @param whiteListSamples A list of samples that shall be tracked
-   * @param projectCode a valid QBiC project code
-   */
-  public void deleteSamples(List<String> whiteListSamples, String projectCode) {
-    try (Session session = sessionProvider.getCurrentSession()) {
-      session.beginTransaction();
-      //1. find out which tracked samples are not on the whitelist
-      var trackedSamples = getSampleLocations(session, projectCode);
-      LOG.info(
-          String.format("Collected %d tracked samples for project %s ...", trackedSamples.size(),
-              projectCode));
-      //2. remove the samples
-      var deletedSamples = 0;
-      for (var sample : trackedSamples) {
-        if (!whiteListSamples.contains(sample.sampleId)) {
-          deleteSampleTracking(session, sample.sampleId);
-          deletedSamples++;
-        }
-      }
-      LOG.info(String.format("Deleted %d samples...",deletedSamples));
-
-      session.getTransaction().commit();
-    } catch (HibernateException exception) {
-      LOG.error(exception.getMessage());
-      throw new HibernateException("Error while trying to remove outdated samples", exception);
-    }
-  }
-
-  /**
    * Returns all sample locations for a given project code
    *
    * @param projectCode The project code for which the tracked samples shall be fetched
    * @return a list of {@link SampleLocation} objects found for the project
    */
-  private List<SampleLocation> getSampleLocations(Session session, String projectCode) {
-    Query<SampleLocation> query = session.createQuery(SAMPLELOCATION_LIKE_CODE_QUERY);
-    query.setParameter("projectCode", projectCode + "%");
+  public List<SampleLocation> getSampleLocations(String projectCode) {
+    List<SampleLocation> sampleLocations;
+    try (Session session = sessionProvider.getCurrentSession()) {
+      session.beginTransaction();
 
-    return new ArrayList<>(query.list());
+      Query<SampleLocation> query = session.createQuery(SAMPLELOCATION_LIKE_CODE_QUERY);
+      query.setParameter("projectCode", projectCode + "%");
+      sampleLocations = new ArrayList<>(query.list());
+
+      session.getTransaction().commit();
+    } catch (HibernateException exception) {
+      throw new HibernateException("Error while trying to remove outdated samples", exception);
+    }
+    return sampleLocations;
   }
 
   /**
    * Deletes the tracking information for a given sample
-   * @param session Session object from hibernate
    * @param sampleCode Respective openbis sample code
    */
-  private void deleteSampleTracking(Session session, String sampleCode) {
-    Query<SampleLocation> query = session.createQuery(SAMPLELOCATION_DELETE_QUERY);
-    query.setParameter("sample", sampleCode);
-    query.executeUpdate();
+  public void deleteSample(String sampleCode) {
+    try (Session session = sessionProvider.getCurrentSession()) {
+      session.beginTransaction();
+
+      Query<SampleLocation> query = session.createQuery(SAMPLELOCATION_DELETE_QUERY);
+      query.setParameter("sample", sampleCode);
+      query.executeUpdate();
+
+      session.getTransaction().commit();
+    } catch (HibernateException exception) {
+      throw new HibernateException("Error while trying to delete sample tracking information", exception);
+    }
   }
 
 }
