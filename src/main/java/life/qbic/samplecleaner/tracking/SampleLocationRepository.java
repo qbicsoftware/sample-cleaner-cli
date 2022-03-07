@@ -13,7 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SampleLocationRepository {
 
-  SessionProvider sessionProvider;
+  private final SessionProvider sessionProvider;
+  private static final String SAMPLELOCATION_LIKE_CODE_QUERY = "FROM SampleLocation WHERE sampleId LIKE :projectCode";
+  private static final String SAMPLELOCATION_DELETE_QUERY = "DELETE FROM SampleLocation WHERE sampleId= :sample";
+
   private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(
       SampleLocationRepository.class);
 
@@ -61,8 +64,7 @@ public class SampleLocationRepository {
    * @return a list of {@link SampleLocation} objects found for the project
    */
   private List<SampleLocation> getSampleLocations(Session session, String projectCode) {
-    Query<SampleLocation> query = session.createQuery(
-        "FROM SampleLocation WHERE sampleId LIKE :projectCode");
+    Query<SampleLocation> query = session.createQuery(SAMPLELOCATION_LIKE_CODE_QUERY);
     query.setParameter("projectCode", projectCode + "%");
 
     return new ArrayList<>(query.list());
@@ -74,9 +76,9 @@ public class SampleLocationRepository {
    * @param sampleCode Respective openbis sample code
    */
   private void deleteSampleTracking(Session session, String sampleCode) {
-    Query<SampleLocation> query = session.createQuery(
-        "DELETE FROM SampleLocation WHERE sampleId= :sample");
+    Query<SampleLocation> query = session.createQuery(SAMPLELOCATION_DELETE_QUERY);
     query.setParameter("sample", sampleCode);
     query.executeUpdate();
   }
+
 }
