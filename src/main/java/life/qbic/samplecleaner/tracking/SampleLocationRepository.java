@@ -2,7 +2,6 @@ package life.qbic.samplecleaner.tracking;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import life.qbic.samplecleaner.database.SessionProvider;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -15,63 +14,68 @@ import org.springframework.stereotype.Component;
 public class SampleLocationRepository {
 
   SessionProvider sessionProvider;
-  private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(SampleLocationRepository.class);
+  private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(
+      SampleLocationRepository.class);
 
   @Autowired
   public SampleLocationRepository(SessionProvider sessionProvider) {
     this.sessionProvider = sessionProvider;
   }
 
-
   /**
-   * Removes all samples from the tracking database that are not part of the whitelist
+   * Deletes all samples from the sample tracking database
+   * that are not mentioned in the provided whitelist for a given project.
+   *
    * @param whiteListSamples A list of samples that shall be tracked
+   * @param projectCode a valid QBiC project code
    */
-  public void removeOutdatedSamples(List<String> whiteListSamples, String projectCode){
+  public void deleteSamples(List<String> whiteListSamples, String projectCode) {
     try (Session session = sessionProvider.getCurrentSession()) {
       session.beginTransaction();
       LOG.info("Starting session ...");
       //1. find out which tracked samples are not on the whitelist
-      List<SampleLocation> trackedSamples = getSampleLocations(session,projectCode);
-      LOG.info(String.format("Collected %d tracked samples for project %s ... %n",trackedSamples.size(),projectCode));
+      var trackedSamples = getSampleLocations(session, projectCode);
+      LOG.info(
+          String.format("Collected %d tracked samples for project %s ... %n", trackedSamples.size(),
+              projectCode));
       //2. remove the samples
-      for (SampleLocation sample:trackedSamples) {
-        if(!whiteListSamples.contains(sample.sampleId)){
-          deleteSampleTracking(session,sample.sampleId);
-          LOG.info(String.format("Deleted sample with ID %s ... %n",sample.sampleId));
+      for (var sample : trackedSamples) {
+        if (!whiteListSamples.contains(sample.sampleId)) {
+          deleteSampleTracking(session, sample.sampleId);
+          LOG.info(String.format("Deleted sample with ID %s ... %n", sample.sampleId));
         }
       }
       session.getTransaction().commit();
       LOG.info("Finished session ...");
     } catch (HibernateException exception) {
       LOG.error(exception.getMessage());
-      throw new HibernateException("Error while trying to remove outdated samples",exception);
+      throw new HibernateException("Error while trying to remove outdated samples", exception);
     }
   }
 
   /**
    * Returns all sample locations for a given project code
+   *
    * @param projectCode The project code for which the tracked samples shall be fetched
    * @return a list of {@link SampleLocation} objects found for the project
    */
   private List<SampleLocation> getSampleLocations(Session session, String projectCode) {
-    List<SampleLocation> sampleLocations = new ArrayList<>();
+    Query<SampleLocation> query = session.createQuery(
+        "FROM SampleLocation WHERE sampleId LIKE :projectCode");
+    query.setParameter("projectCode", projectCode + "%");
 
-      Query<SampleLocation> query = session.createQuery("FROM SampleLocation WHERE sampleId LIKE :projectCode");
-      query.setParameter("projectCode", projectCode + "%");
-
-      sampleLocations.addAll(query.list());
-
-    return sampleLocations;
+    return new ArrayList<>(query.list());
   }
 
   /**
    * Deletes the tracking information for a given sample
+   *
    * @param sampleCode
    */
-  private void deleteSampleTracking(Session session, String sampleCode){
-    Query<SampleLocation> query = session.createQuery("DELETE FROM SampleLocation WHERE sampleId= :sample");
-    query.setParameter("sample",sampleCode);
+  private void deleteSampleTracking(Session session, String sampleCode) {
+    Query<SampleLocation> query = session.createQuery(
+        "DELETE FROM SampleLocation WHERE sampleId= :sample");
+    query.setParameter("sample", sampleCode);
     query.executeUpdate();
   }
 }

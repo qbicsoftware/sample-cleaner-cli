@@ -1,10 +1,16 @@
 package life.qbic.samplecleaner;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import life.qbic.samplecleaner.tracking.SampleLocationRepository;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +25,8 @@ public class App implements CommandLineRunner {
   final ApplicationContext applicationContext;
 
   final SampleLocationRepository sampleLocationRepository;
+
+  final static Pattern sampleCodePattern = Pattern.compile("^Q.*");
 
   private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(App.class);
   private final List<String> whiteListedSamples = new ArrayList<>();
@@ -40,7 +48,7 @@ public class App implements CommandLineRunner {
     String filePath = args[0];
     try {
       parseWhiteList(filePath);
-      sampleLocationRepository.removeOutdatedSamples(whiteListedSamples, getProjectCode());
+      sampleLocationRepository.deleteSamples(whiteListedSamples, getProjectCode());
     } catch (Exception e) {
       LOG.error(e.getMessage());
     }
@@ -49,6 +57,23 @@ public class App implements CommandLineRunner {
   private String getProjectCode() {
     String projectCode = whiteListedSamples.get(0).substring(0, 5);
     return projectCode;
+  }
+
+  private static List<String> parseWhiteList2(String pathToFile) throws IOException {
+    List<String> lines = Files.readAllLines(Paths.get(pathToFile));
+    return lines.stream()
+        .map(App::extractFirstColumn)
+        .filter(App::isSampleCode)
+        .collect(Collectors.toList());
+  }
+
+  private static String extractFirstColumn(String line) {
+    return line.split("\t")[0];
+  }
+
+  private static boolean isSampleCode(String code) {
+    Matcher matcher = sampleCodePattern.matcher(code);
+    return matcher.find();
   }
 
   private void parseWhiteList(String pathToFile) {
