@@ -24,7 +24,8 @@ public class App implements CommandLineRunner {
   private final List<String> whiteListedSamples = new ArrayList<>();
 
   @Autowired
-  public App(ApplicationContext applicationContext, SampleLocationRepository sampleLocationRepository) {
+  public App(
+      ApplicationContext applicationContext, SampleLocationRepository sampleLocationRepository) {
     this.applicationContext = applicationContext;
     this.sampleLocationRepository = sampleLocationRepository;
   }
@@ -35,22 +36,22 @@ public class App implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-   LOG.info("Parsing whitelist ...");
+    LOG.info("Parsing whitelist ...");
     String filePath = args[0];
-    try{
+    try {
       parseWhiteList(filePath);
-      sampleLocationRepository.removeOutdatedSamples(whiteListedSamples,getProjectCode());
-    }catch (Exception e){
+      sampleLocationRepository.removeOutdatedSamples(whiteListedSamples, getProjectCode());
+    } catch (Exception e) {
       LOG.error(e.getMessage());
     }
   }
 
-  private String getProjectCode(){
-    String projectCode = whiteListedSamples.get(0).substring(0,5);
+  private String getProjectCode() {
+    String projectCode = whiteListedSamples.get(0).substring(0, 5);
     return projectCode;
   }
 
-  private void parseWhiteList(String pathToFile){
+  private void parseWhiteList(String pathToFile) {
     try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
       String line;
       while ((line = br.readLine()) != null) {
@@ -58,12 +59,11 @@ public class App implements CommandLineRunner {
         String[] columns = line.split("\t");
         String sampleCode = columns[0];
 
-        if(sampleCode.startsWith("Q")){
+        if (sampleCode.startsWith("Q")) {
           whiteListedSamples.add(sampleCode);
         }
       }
-    }
-    catch(IOException ioException){
+    } catch (IOException ioException) {
       LOG.error("Failed reading input sample file");
       LOG.error(ioException.getMessage());
     }
