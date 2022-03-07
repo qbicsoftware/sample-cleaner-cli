@@ -17,7 +17,7 @@
 A Spring Boot CLI to remove sample tracking information for deleted samples.
 </div>
 
-When deleting samples from our openBis instance the associated sample tracking information still persits in our database.
+When deleting samples from our openBis instance the associated sample tracking information still persists in our database.
 To remove this (outdated) tracking information the CLI collects all currently registered samples and removes the tracking information for the samples that are not
 stored in our database anymore.
 
@@ -40,10 +40,22 @@ The JAR file will be created in the ``/target`` folder, for example:
 Just change into the folder and run the CLI app with:
 
 ```
-java -jar sample-cleaner-cli-1.0.0.jar -sampleList file.tsv
+java -jar sample-cleaner-cli-1.0.0.jar file.tsv
 ```
 
-More information about the parameters can be found in section **How to use**
+## How to use
+
+### Valid sample list
+
+Provide a list with all valid samples of type`Q-TEST-SAMPLE` that you can download directy from openbis. The file is in TSV format and should contain the sample ids in the first column.
+
+```
+Code	
+QSTTS022AH	
+QSTTS023AP	
+QSTTS030A8	
+QSTTS020A1	
+```
 
 ### Configuration
 
@@ -66,23 +78,6 @@ databases.users.database.url=${USER_DB_URL:localhost}
 databases.users.user.name=${USER_DB_USER_NAME:myusername}
 databases.users.user.password=${USER_DB_USER_PW:astrongpassphrase!}
 ```
-
-## How to use
-
-### --sampleList
-
-Provide a list with all valid samples of type`Q-TEST-SAMPLE`. The file is in TSV format and should contain the sample ids in the first column.
-
-```
-Code	
-QSTTS022AH	
-QSTTS023AP	
-QSTTS030A8	
-QSTTS020A1	
-```
-
-
-
 
 ## Licence
 This work is licensed under the [MIT license](https://mit-license.org/).
