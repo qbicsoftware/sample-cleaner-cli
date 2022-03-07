@@ -47,6 +47,7 @@ public class App implements CommandLineRunner {
     String filePath = args[0];
     try {
       List<String> whiteListedSamples = parseWhiteList(filePath);
+      LOG.info(String.format("%d samples are whitelisted ...", whiteListedSamples.size()));
       String projectCode = getProjectCode(whiteListedSamples);
 
       sampleLocationRepository.deleteSamples(whiteListedSamples, projectCode);

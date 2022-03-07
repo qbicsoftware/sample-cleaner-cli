@@ -38,12 +38,15 @@ public class SampleLocationRepository {
           String.format("Collected %d tracked samples for project %s ...", trackedSamples.size(),
               projectCode));
       //2. remove the samples
+      var deletedSamples = 0;
       for (var sample : trackedSamples) {
         if (!whiteListSamples.contains(sample.sampleId)) {
           deleteSampleTracking(session, sample.sampleId);
-          LOG.info(String.format("Deleted sample with ID %s ...", sample.sampleId));
+          deletedSamples++;
         }
       }
+      LOG.info(String.format("Deleted %d samples...",deletedSamples));
+
       session.getTransaction().commit();
     } catch (HibernateException exception) {
       LOG.error(exception.getMessage());
