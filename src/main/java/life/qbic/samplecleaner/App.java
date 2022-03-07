@@ -43,7 +43,7 @@ public class App implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    LOG.info("Parsing whitelist ...");
+    LOG.info("Parsing sample id whitelist ...");
     String filePath = args[0];
     try {
       List<String> whiteListedSamples = parseWhiteList(filePath);

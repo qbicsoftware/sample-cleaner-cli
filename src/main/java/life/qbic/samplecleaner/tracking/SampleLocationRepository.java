@@ -32,7 +32,6 @@ public class SampleLocationRepository {
   public void deleteSamples(List<String> whiteListSamples, String projectCode) {
     try (Session session = sessionProvider.getCurrentSession()) {
       session.beginTransaction();
-      LOG.info("Starting session ...");
       //1. find out which tracked samples are not on the whitelist
       var trackedSamples = getSampleLocations(session, projectCode);
       LOG.info(
@@ -46,7 +45,6 @@ public class SampleLocationRepository {
         }
       }
       session.getTransaction().commit();
-      LOG.info("Finished session ...");
     } catch (HibernateException exception) {
       LOG.error(exception.getMessage());
       throw new HibernateException("Error while trying to remove outdated samples", exception);
