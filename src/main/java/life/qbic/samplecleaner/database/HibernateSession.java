@@ -20,32 +20,32 @@ import org.springframework.stereotype.Component;
 @Component
 public class HibernateSession implements SessionProvider {
 
-    final SessionFactory sessionFactory;
+  final SessionFactory sessionFactory;
 
-    @Autowired
-    public HibernateSession(DataBaseConfig config) {
-        var hibernateConfig = new Configuration();
-        var properties = new Properties();
-        properties.put(Environment.DRIVER, config.driver);
-        properties.put(Environment.URL, config.url);
-        properties.put(Environment.USER, config.user);
-        properties.put(Environment.PASS, config.password);
-        properties.put(Environment.DIALECT, config.sqlDialect);
-        properties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+  @Autowired
+  public HibernateSession(DataBaseConfig config) {
+    var hibernateConfig = new Configuration();
+    var properties = new Properties();
+    properties.put(Environment.DRIVER, config.driver);
+    properties.put(Environment.URL, config.url);
+    properties.put(Environment.USER, config.user);
+    properties.put(Environment.PASS, config.password);
+    properties.put(Environment.DIALECT, config.sqlDialect);
+    properties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
 
-        hibernateConfig.setProperties(properties);
-        hibernateConfig.addAnnotatedClass(SampleLocation.class);
+    hibernateConfig.setProperties(properties);
+    hibernateConfig.addAnnotatedClass(SampleLocation.class);
 
-        sessionFactory = hibernateConfig.buildSessionFactory();
-    }
+    sessionFactory = hibernateConfig.buildSessionFactory();
+  }
 
-    @Override
-    public Session getCurrentSession() {
-        return sessionFactory.getCurrentSession();
-    }
+  @Override
+  public Session getCurrentSession() {
+    return sessionFactory.getCurrentSession();
+  }
 
-    @PreDestroy
-    void destroy() {
-        sessionFactory.close();
-    }
+  @PreDestroy
+  void destroy() {
+    sessionFactory.close();
+  }
 }

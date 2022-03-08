@@ -49,6 +49,7 @@ public class SampleLocationRepository {
 
   /**
    * Deletes the tracking information for a given sample
+   *
    * @param sampleCode Respective openbis sample code
    */
   public void deleteSample(String sampleCode) {
@@ -61,7 +62,8 @@ public class SampleLocationRepository {
 
       session.getTransaction().commit();
     } catch (HibernateException exception) {
-      throw new HibernateException("Error while trying to delete sample tracking information", exception);
+      throw new HibernateException("Error while trying to delete sample tracking information",
+          exception);
     }
   }
 

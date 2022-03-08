@@ -1,14 +1,5 @@
 package life.qbic.samplecleaner;
 
-import life.qbic.samplecleaner.tracking.SampleLocation;
-import life.qbic.samplecleaner.tracking.SampleLocationRepository;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,6 +8,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import life.qbic.samplecleaner.tracking.SampleLocation;
+import life.qbic.samplecleaner.tracking.SampleLocationRepository;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
 public class App implements CommandLineRunner {
@@ -66,7 +65,7 @@ public class App implements CommandLineRunner {
     }
   }
 
-  private List<SampleLocation> extractSamplesToDelete(
+  private static List<SampleLocation> extractSamplesToDelete(
       Set<String> whiteListedSamples, List<SampleLocation> trackedSamples) {
     return trackedSamples.stream()
         .filter(sampleLocation -> !whiteListedSamples.contains(sampleLocation.getSampleId()))
@@ -79,7 +78,7 @@ public class App implements CommandLineRunner {
     }
   }
 
-  private String extractProjectCode(String sampleCode) {
+  private static String extractProjectCode(String sampleCode) {
     return sampleCode.substring(0, 5);
   }
 
