@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -46,7 +45,7 @@ public class App implements CommandLineRunner {
     LOG.info("Parsing sample id whitelist ...");
     String filePath = args[0];
     try {
-      HashSet<String> whiteListedSamples = (HashSet<String>) parseWhiteList(filePath);
+      Set<String> whiteListedSamples = parseWhiteList(filePath);
       LOG.info(String.format("%d samples are whitelisted ...", whiteListedSamples.size()));
 
       String whiteListedSample = whiteListedSamples.iterator().next();
@@ -68,7 +67,7 @@ public class App implements CommandLineRunner {
   }
 
   private List<SampleLocation> extractSamplesToDelete(
-      HashSet<String> whiteListedSamples, List<SampleLocation> trackedSamples) {
+      Set<String> whiteListedSamples, List<SampleLocation> trackedSamples) {
     return trackedSamples.stream()
         .filter(sampleLocation -> !whiteListedSamples.contains(sampleLocation.getSampleId()))
         .collect(Collectors.toList());
