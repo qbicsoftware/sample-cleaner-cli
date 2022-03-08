@@ -79,8 +79,8 @@ public class App implements CommandLineRunner {
     }
   }
 
-  private String getProjectCode(List<String> samples) {
-    return samples.get(0).substring(0, 5);
+  private String extractProjectCode(String sampleCode) {
+    return samples.substring(0, 5);
   }
 
   private static List<String> parseWhiteList(String pathToFile) throws IOException {
