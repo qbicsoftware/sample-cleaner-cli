@@ -59,8 +59,8 @@ public class App implements CommandLineRunner {
                       projectCode));
 
       var samplesToDelete = extractSamplesToDelete(whiteListedSamples,trackedSamples);
-      var deletedSamples = deleteAllSamples(samplesToDelete);
-      LOG.info(String.format("Deleted %d samples...",deletedSamples));
+      deleteAllSamples(samplesToDelete);
+      LOG.info(String.format("Deleted %d samples...",samplesToDelete.size()));
 
     } catch (Exception e) {
       LOG.error(e.getMessage());
@@ -73,13 +73,10 @@ public class App implements CommandLineRunner {
             .collect(Collectors.toList());
   }
 
-  private int deleteAllSamples(List<SampleLocation> samples){
-    var deletedSamples = 0;
+  private void deleteAllSamples(List<SampleLocation> samples){
     for (var sample : samples) {
       sampleLocationRepository.deleteSample(sample.getSampleId());
-      deletedSamples++;
     }
-    return deletedSamples;
   }
 
   private String getProjectCode(List<String> samples) {
