@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -48,10 +50,11 @@ public class App implements CommandLineRunner {
     LOG.info("Parsing sample id whitelist ...");
     String filePath = args[0];
     try {
-      List<String> whiteListedSamples = parseWhiteList(filePath);
+      HashSet<String> whiteListedSamples = (HashSet<String>) parseWhiteList(filePath);
       LOG.info(String.format("%d samples are whitelisted ...", whiteListedSamples.size()));
 
-      String projectCode = getProjectCode(whiteListedSamples);
+      String whiteListedSample = whiteListedSamples.iterator().next();
+      String projectCode = extractProjectCode(whiteListedSample);
 
       var trackedSamples = sampleLocationRepository.getSampleLocations(projectCode);
       LOG.info(
@@ -67,7 +70,7 @@ public class App implements CommandLineRunner {
     }
   }
 
-  private List<SampleLocation> extractSamplesToDelete(List<String> whiteListedSamples, List<SampleLocation> trackedSamples){
+  private List<SampleLocation> extractSamplesToDelete(HashSet<String> whiteListedSamples, List<SampleLocation> trackedSamples){
     return trackedSamples.stream()
             .filter(sampleLocation -> !whiteListedSamples.contains(sampleLocation.getSampleId()))
             .collect(Collectors.toList());
@@ -80,15 +83,15 @@ public class App implements CommandLineRunner {
   }
 
   private String extractProjectCode(String sampleCode) {
-    return samples.substring(0, 5);
+    return sampleCode.substring(0, 5);
   }
 
-  private static List<String> parseWhiteList(String pathToFile) throws IOException {
+  private static Set<String> parseWhiteList(String pathToFile) throws IOException {
     List<String> lines = Files.readAllLines(Paths.get(pathToFile));
     return lines.stream()
         .map(App::extractFirstColumn)
         .filter(App::isSampleCode)
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 
   private static String extractFirstColumn(String line) {
