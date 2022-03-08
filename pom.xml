@@ -15,7 +15,6 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
-		<groovy.version>3.0.8</groovy.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -29,16 +28,17 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.17.2</version>
+		</dependency>
 		<!-- database connections -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -67,20 +67,6 @@
 			<artifactId>hibernate-core</artifactId>
 			<version>5.6.5.Final</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.spockframework</groupId>
-			<artifactId>spock-core</artifactId>
-			<version>2.0-groovy-3.0</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.spockframework</groupId>
-			<artifactId>spock-spring</artifactId>
-			<version>2.0-groovy-3.0</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<!-- This configures the target artifact repositories for deployment
@@ -108,20 +94,17 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.gmavenplus</groupId>
-				<artifactId>gmavenplus-plugin</artifactId>
-				<version>1.13.0</version>
+				<groupId>org.hibernate.orm.tooling</groupId>
+				<artifactId>hibernate-enhance-maven-plugin</artifactId>
+				<version>5.6.0.Final</version>
 				<executions>
 					<execution>
+						<configuration>
+							<failOnError>true</failOnError>
+							<enableLazyInitialization>true</enableLazyInitialization>
+						</configuration>
 						<goals>
-							<goal>addSources</goal>
-							<goal>addTestSources</goal>
-							<goal>generateStubs</goal>
-							<goal>compile</goal>
-							<goal>generateTestStubs</goal>
-							<goal>compileTests</goal>
-							<goal>removeStubs</goal>
-							<goal>removeTestStubs</goal>
+							<goal>enhance</goal>
 						</goals>
 					</execution>
 				</executions>
