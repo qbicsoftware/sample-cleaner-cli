@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>life.qbic</groupId>
-	<artifactId>spring-minimal-template</artifactId>
-	<version>1.0.2</version>
-	<name>spring-minimal-template</name>
-	<description>Demo project for Spring Boot</description>
+	<artifactId>sample-cleaner-cli</artifactId>
+	<version>1.0.0</version>
+	<name>Sample Cleaner CLI</name>
+	<description>Cleans-up sample tracking information for outdated samples</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
