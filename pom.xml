@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>life.qbic</groupId>
 	<artifactId>spring-minimal-template</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.0</version>
 	<name>spring-minimal-template</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
